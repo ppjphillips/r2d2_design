@@ -7,7 +7,8 @@ library(shiny)
 
 R2D2_path <- "C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/data/"
 
-R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_05.dta"))
+#R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_05.dta"))
+R2D2_sim_data <- read_dta(all_data4R_2020_10_05.dta)
   
 
 # Read in data and round to 3 dp to avoid floating error

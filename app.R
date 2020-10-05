@@ -5,6 +5,7 @@ library(scales)
 library(knitr)
 library(shiny)
 
+#R2D2_path <- "C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/data/"
 R2D2_path <- "https://github.com/ppjphillips/r2d2_design/raw/main/"
 
 R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_05.dta"))
@@ -21,6 +22,7 @@ input <- list(
   uitau_fend = 0.8,
   uitau_LRV = 0.025,
   uitau_TV = 0.025,
+  ussize = 500,
   uiprev = 0.2,
   uitrue_s = c(0.7,0.8,0.85,0.9,0.95)
 )
@@ -35,12 +37,12 @@ ui <- fixedPage(
   sidebarLayout(
     
     sidebarPanel(
-      h3("Targets"),
+      h3("Target Sensitivity"),
       
       #p("WHO TPP Target: 90%"),
                  
       sliderInput(
-        "uitargets", label = "Select the Target Value (right slider) and Minimum Acceptable Value (left slider):",
+        "uitargets", label = "Target Value (right) and Minimum Acceptable Value (left):",
         min = 0.5, max = 0.95, value = c(0.7,0.8), ticks = FALSE, step = 0.05
       ), 
       
@@ -48,18 +50,18 @@ ui <- fixedPage(
 
       sliderInput(
         "uitau_LRV", label = "False GO:",
-        min = 0, max = 0.2, value = 0.1, ticks=TRUE, step = 0.025
+        min = 0, max = 0.2, value = 0.1, ticks=FALSE, step = 0.025
       ),
       sliderInput(
         "uitau_TV", label = "False no-GO:",
-        min = 0, max = 0.2, value = 0.1, ticks=TRUE, step = 0.025
+        min = 0, max = 0.2, value = 0.1, ticks=FALSE, step = 0.025
       ),  
       
       h3("Sample size"),
       
       sliderInput(
         "uissize", label = "Maximum for plotting:",
-        min = 100, max = 1000, value = 1000, ticks=FALSE, step = 100
+        min = 100, max = 1000, value = 500, ticks=FALSE, step = 100
       ),  
       
       h3("Prevalence"),
@@ -119,8 +121,7 @@ server <- function(input, output) {
         mutate(      plot_go = 1) %>% # Plt area for GO (=1)
         mutate(plot_consider = dec_0 + dec_9) %>% # Plot area for consider
         mutate(    plot_nogo = dec_0)  # Plot area for noGO
-      
-      
+     
       # Some checks
       # x <- plot_data_pulks_sens %>% 
       #   filter (
@@ -133,26 +134,28 @@ server <- function(input, output) {
       #     totn == 100
       #   )
       # 
+      R2D2_plot_data
       
       
+      dec_colors <- c('No-Go'='red2','Go'='green2','Consider'='blue2')
       
       ggplot(data = filter(R2D2_plot_data)) +
-        geom_area(aes(totn, plot_go),      fill='green4') +
-        geom_area(aes(totn, plot_consider), fill='blue3') +
-        geom_area(aes(totn, plot_nogo),    fill='red3') +
-        #geom_line(data = filter(plot_data_pulks_sens,prev==200), color='black',size=2,linetype='solid',aes(x=totn,y=plot_consider)) +
-        #geom_line(data = filter(plot_data,prev==0.15), color='black',size=2,linetype='longdash',aes(x=totn,y=LRV)) +
-        #scale_x_continuous('Sample size',
-         #                  breaks = c(100,200,300,400,500,600),limits=c(100,600)) +
+        geom_area(aes(totn, plot_go,       fill="Go"),       alpha=0.8) +
+        geom_area(aes(totn, plot_consider, fill="Consider"), alpha=0.8) +
+        geom_area(aes(totn, plot_nogo,     fill="No-Go"),    alpha=0.8) +
+        geom_line(aes(totn,0.5), linetype = "dashed") +
+        geom_line(aes(totn,0.9), linetype = "dashed") +
+        geom_line(aes(totn,0.1), linetype = "dashed") +
+        scale_fill_manual(values = dec_colors) +
+        facet_grid(~true_stxt) +
+        theme_gray(base_size=15) +
         scale_y_continuous('Decision probabilities',
                            breaks = seq(0,1,0.1)) +
-        theme(
-          axis.text.x = element_text(
-            size=rel(2),
-            angle = 90
-          )
-        ) +
-        facet_grid(cols = vars(true_stxt))
+        scale_x_continuous('Sample size') + 
+        labs(fill = "Decision:") +
+        theme(legend.position="bottom") +
+        theme(axis.text.x = element_text(angle = 90))
+      
       
       
     })  

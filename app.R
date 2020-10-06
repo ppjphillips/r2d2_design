@@ -50,11 +50,11 @@ ui <- fixedPage(
 
       sliderInput(
         "uitau_LRV", label = "False GO:",
-        min = 0, max = 0.2, value = 0.1, ticks=FALSE, step = 0.025
+        min = 0, max = 0.25, value = 0.1, ticks=FALSE, step = 0.025
       ),
       sliderInput(
         "uitau_TV", label = "False no-GO:",
-        min = 0, max = 0.2, value = 0.1, ticks=FALSE, step = 0.025
+        min = 0, max = 0.25, value = 0.1, ticks=FALSE, step = 0.025
       ),  
       
       h3("Sample size"),

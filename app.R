@@ -12,7 +12,7 @@ R2D2_path <- "https://github.com/ppjphillips/r2d2_design/raw/main/"
   # Path for web usage
 
 #To push to shiny server.
-#deployApp("C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/shinypost")
+#rsconnect::deployApp("C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/shinypost")
 
 R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_05.dta"))
   
@@ -56,7 +56,7 @@ ui <- fillPage(
 
       sliderInput(
         "uitau_LRV", label = "False GO:",
-        min = 0, max = 0.25, value = 0.1, ticks=FALSE, step = 0.025
+        min = 0, max = 0.25, value = 0.1, ticks=FALSE, step = 0.05
       ),
       sliderInput(
         "uitau_TV", label = "False no-GO:",

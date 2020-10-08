@@ -85,7 +85,7 @@ ui <- fillPage(
       checkboxGroupInput(
         inputId = "uitrue_s", 
         label = "Select which true accuracy values to plot:",
-        choices = c("60%" = 0.6, "65%" = 0.65, "68%" = 0.68
+        choices = c("60%" = 0.6, "65%" = 0.65, "68%" = 0.68,
                     "70%" = 0.7, "75%" = 0.75,
                     "80%" = 0.8, "85%" = 0.85,
                     "90%" = 0.9, "92%" = 0.92, 

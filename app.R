@@ -8,11 +8,11 @@ library(patchwork)
 
 #R2D2_path <- "C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/data/"
 
-R2D2_path <- "https://github.com/ppjphillips/r2d2_design/raw/main/"
+R2D2_path <- "https://github.com/ppjphillips/r2d2_design/raw/master/"
   # Path for web usage
 
 #To push to shiny server.
-#rsconnect::deployApp("C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/shinypost")
+#deployApp("C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/shinypost")
 
 R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_05.dta"))
   
@@ -131,12 +131,12 @@ server <- function(input, output) {
         mutate(    plot_nogo = dec_0)  # Plot area for noGO
 
     
-      dec_colors <- c('No-Go'='red2','Go'='green2','Consider'='blue2')
+      dec_colors <- c('No-Go'='#cc3232','Go'='#33a532','Consider'='#e7b416')
       
       p1 <- ggplot(data = filter(R2D2_plot_data,acc  %in% (as.numeric(input$uitrue_s) * 1000))) +
-        geom_area(aes(totn, plot_go,       fill="Go"),       alpha=0.8) +
-        geom_area(aes(totn, plot_consider, fill="Consider"), alpha=0.8) +
-        geom_area(aes(totn, plot_nogo,     fill="No-Go"),    alpha=0.8) +
+        geom_area(aes(totn, plot_go,       fill="Go"),       alpha=1) +
+        geom_area(aes(totn, plot_consider, fill="Consider"), alpha=1) +
+        geom_area(aes(totn, plot_nogo,     fill="No-Go"),    alpha=1) +
         geom_line(aes(totn,0.5), linetype = "dashed") +
         geom_line(aes(totn,0.9), linetype = "dashed") +
         geom_line(aes(totn,0.1), linetype = "dashed") +
@@ -153,9 +153,9 @@ server <- function(input, output) {
       
     
       p2 <- ggplot(data = filter(R2D2_plot_data)) +
-        geom_area(aes(plot_acc, plot_go,       fill="Go"),       alpha=0.8) +
-        geom_area(aes(plot_acc, plot_consider, fill="Consider"), alpha=0.8) +
-        geom_area(aes(plot_acc, plot_nogo,     fill="No-Go"),    alpha=0.8) +
+        geom_area(aes(plot_acc, plot_go,       fill="Go"),       alpha=1) +
+        geom_area(aes(plot_acc, plot_consider, fill="Consider"), alpha=1) +
+        geom_area(aes(plot_acc, plot_nogo,     fill="No-Go"),    alpha=1) +
         geom_line(aes(plot_acc,0.5), linetype = "dashed") +
         geom_line(aes(plot_acc,0.9), linetype = "dashed") +
         geom_line(aes(plot_acc,0.1), linetype = "dashed") +

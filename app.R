@@ -14,7 +14,7 @@ R2D2_path <- "https://github.com/ppjphillips/r2d2_design/raw/master/"
 #To push to shiny server.
 #deployApp("C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/shinypost")
 
-R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_05.dta"))
+R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_20.dta"))
   
 
 # Read in data and round to 3 dp to avoid floating error
@@ -43,7 +43,7 @@ ui <- fillPage(
   sidebarLayout(
     
     sidebarPanel(
-      h3("Target Sensitivity"),
+      h3("Target Sensitivity / Specificity"),
       
       #p("WHO TPP Target: 90%"),
                  
@@ -63,19 +63,19 @@ ui <- fillPage(
         min = 0, max = 0.25, value = 0.1, ticks=FALSE, step = 0.05
       ),  
       
-      h3("Sample size"),
+      h3("Total diseased (sensitivity) / Total not diseased (specificity)"),
       
       sliderInput(
         "uissize", label = "Range for plotting:",
-        min = 0, max = 1000, value = c(0,500), ticks=FALSE, step = 100
+        min = 0, max = 1000, value = c(0,500), ticks=FALSE, step = 50
       ),  
       
-      h3("Prevalence"),
+      #h3("Prevalence"),
 
-      sliderInput(
-        "uiprev", label = "Prevalence of disease:",
-        min = 0.1, max = 0.25, value = 0.2, ticks=FALSE, step = 0.05
-      ),  
+      #sliderInput(
+      #  "uiprev", label = "Prevalence of disease:",
+      #  min = 0.1, max = 0.25, value = 0.2, ticks=FALSE, step = 0.05
+      #),  
       
       width = 2
     ),
@@ -84,13 +84,13 @@ ui <- fillPage(
      
       checkboxGroupInput(
         inputId = "uitrue_s", 
-        label = "Select which true accuracy values to plot:",
+        label = "Select which true sensitivity / specificity values to plot:",
         choices = c("60%" = 0.6, "65%" = 0.65, "68%" = 0.68,
                     "70%" = 0.7, "75%" = 0.75,
                     "80%" = 0.8, "85%" = 0.85,
                     "90%" = 0.9, "92%" = 0.92, 
                     "95%" = 0.95, "98%" = 0.98),
-        selected = c(0.6,0.7,0.8,0.9,0.95),
+        selected = c(0.65,0.7,0.75,0.8,0.9),
         inline = TRUE
       ),
       
@@ -120,9 +120,9 @@ server <- function(input, output) {
           tau_TV  == (input$uitau_TV * 1000),
           target_LRV == (input$uitargets[1] * 1000),
           target_TV  == (input$uitargets[2] * 1000),
-          totn <= input$uissize[2],
-          totn >= input$uissize[1],
-          prev %in% (as.numeric(  input$uiprev) * 1000)
+          ndis <= input$uissize[2],
+          ndis >= input$uissize[1]
+          #prev %in% (as.numeric(  input$uiprev) * 1000)
         ) %>%
         mutate(true_stxt = scales::percent(acc/1000,accuracy=1)) %>%
         mutate(plot_acc = acc/1000) %>%
@@ -134,25 +134,25 @@ server <- function(input, output) {
       dec_colors <- c('No-Go'='#cc3232','Go'='#33a532','Consider'='#e7b416')
       
       p1 <- ggplot(data = filter(R2D2_plot_data,acc  %in% (as.numeric(input$uitrue_s) * 1000))) +
-        geom_area(aes(totn, plot_go,       fill="Go"),       alpha=1) +
-        geom_area(aes(totn, plot_consider, fill="Consider"), alpha=1) +
-        geom_area(aes(totn, plot_nogo,     fill="No-Go"),    alpha=1) +
-        geom_line(aes(totn,0.5), linetype = "dashed") +
-        geom_line(aes(totn,0.9), linetype = "dashed") +
-        geom_line(aes(totn,0.1), linetype = "dashed") +
+        geom_area(aes(ndis, plot_go,       fill="Go"),       alpha=1) +
+        geom_area(aes(ndis, plot_consider, fill="Consider"), alpha=1) +
+        geom_area(aes(ndis, plot_nogo,     fill="No-Go"),    alpha=1) +
+        geom_line(aes(ndis,0.5), linetype = "dashed") +
+        geom_line(aes(ndis,0.9), linetype = "dashed") +
+        geom_line(aes(ndis,0.1), linetype = "dashed") +
         scale_fill_manual(values = dec_colors) +
         facet_grid(~true_stxt) +
         theme_gray(base_size=15) +
         scale_y_continuous('Decision probabilities',
                            breaks = seq(0,1,0.1)) +
-        scale_x_continuous('Sample size') + 
+        scale_x_continuous('Total diseased (sensitivity) / Total not diseased (specificity)') + 
         labs(fill = "Decision:") +
         theme(legend.position="bottom") +
         theme(axis.text.x = element_text(angle = 90)) + 
-        ggtitle("Decision Probabilities plotted by Sample Size (separated by True Test Accuracy)")
+        ggtitle("Decision probabilities plotted by total diseased / not diseased (separated by true sensitivity / specificity)")
       
     
-      p2 <- ggplot(data = filter(R2D2_plot_data)) +
+      p2 <- ggplot(data = filter(R2D2_plot_data, ndis %in% c(10,20,50,100,150,250,500,750,1000))) +
         geom_area(aes(plot_acc, plot_go,       fill="Go"),       alpha=1) +
         geom_area(aes(plot_acc, plot_consider, fill="Consider"), alpha=1) +
         geom_area(aes(plot_acc, plot_nogo,     fill="No-Go"),    alpha=1) +
@@ -160,15 +160,15 @@ server <- function(input, output) {
         geom_line(aes(plot_acc,0.9), linetype = "dashed") +
         geom_line(aes(plot_acc,0.1), linetype = "dashed") +
         scale_fill_manual(values = dec_colors) +
-        facet_grid(~totn) +
+        facet_grid(~ndis) +
         theme_gray(base_size=15) +
         scale_y_continuous('Decision probabilities',
                            breaks = seq(0,1,0.1)) +
-        scale_x_continuous('True accuracy parameters') + 
+        scale_x_continuous('True sensitivity / specificity') + 
         labs(fill = "Decision:") +
         theme(legend.position="bottom") +
         theme(axis.text.x = element_text(angle = 90)) + 
-        ggtitle("Decision Probabilities plotted by True Test Accuracy (separated by Sample Size)")
+        ggtitle("Decision probabilities plotted by true sensitivity / specificity (separated by total diseased / not diseased)")
       
       p1 / p2 
       

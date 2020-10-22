@@ -14,7 +14,10 @@ R2D2_path <- "https://github.com/ppjphillips/r2d2_design/raw/master/"
 #To push to shiny server.
 #deployApp("C:/Users/ppjph/OneDrive - University of California, San Francisco/Other_Projects/R2D2/Analysis/2020_10_Design/shinypost")
 
-R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_20.dta"))
+# To run fron GitHub
+# shiny::runGitHub("r2d2_design","ppjphillips")
+
+R2D2_sim_data <- read_dta(str_c(R2D2_path,"all_data4R_2020_10_22.dta"))
   
 
 # Read in data and round to 3 dp to avoid floating error
@@ -85,7 +88,8 @@ ui <- fillPage(
       checkboxGroupInput(
         inputId = "uitrue_s", 
         label = "Select which true sensitivity / specificity values to plot:",
-        choices = c("60%" = 0.6, "65%" = 0.65, "68%" = 0.68,
+        choices = c("50%" = 0.5, "55%" = 0.55,
+                    "60%" = 0.6, "65%" = 0.65, "68%" = 0.68,
                     "70%" = 0.7, "75%" = 0.75,
                     "80%" = 0.8, "85%" = 0.85,
                     "90%" = 0.9, "92%" = 0.92, 
